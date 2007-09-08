@@ -12,30 +12,30 @@
  * send a note to license@php.net so we can mail you a copy immediately.
  *
  * @category   pear
- * @package    PEAR
+ * @package    PEAR2_Exception
  * @author     Tomas V. V. Cox <cox@idecnet.com>
  * @author     Hans Lellelid <hans@velum.net>
  * @author     Bertrand Mansion <bmansion@mamasam.com>
  * @author     Greg Beaver <cellog@php.net>
- * @copyright  1997-2006 The PHP Group
+ * @copyright  1997-2007 The PHP Group
  * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
  * @version    CVS: $Id: Exception.php,v 1.28 2007/05/07 01:58:54 cellog Exp $
  * @link       http://pear.php.net/package/PEAR
- * @since      File available since Release 1.3.3
+ * @since      File available since Release 0.1.0
  */
 
 
 /**
- * Base PEAR_Exception Class
+ * Base PEAR2_Exception Class
  *
  * 1) Features:
  *
- * - Nestable exceptions (throw new PEAR_Exception($msg, $prev_exception))
+ * - Nestable exceptions (throw new PEAR2_Exception($msg, $prev_exception))
  * - Definable triggers, shot when exceptions occur
  * - Pretty and informative error messages
  * - Added more context info available (like class, method or cause)
- * - cause can be a PEAR_Exception or an array of mixed
- *   PEAR_Exceptions/PEAR_ErrorStack warnings
+ * - cause can be a PEAR2_Exception or an array of mixed
+ *   PEAR2_Exceptions or a PEAR2_MultiErrors
  * - callbacks for specific exception classes and their children
  *
  * 2) Ideas:
@@ -65,24 +65,25 @@
  * 5) Usage example
  *
  * <code>
- *  require_once 'PEAR/Exception.php';
- *
+ * class PEAR2_MyPackage_Exception extends PEAR2_Exception {}
  *  class Test {
- *     function foo() {
- *         throw new PEAR_Exception('Error Message', ERROR_CODE);
+ *     function foo()
+ *     {
+ *         throw new PEAR2_MyPackage_Exception('Error Message', ERROR_CODE);
  *     }
  *  }
  *
- *  function myLogger($pear_exception) {
+ *  function myLogger($pear_exception)
+ *  {
  *     echo $pear_exception->getMessage();
  *  }
  *  // each time a exception is thrown the 'myLogger' will be called
  *  // (its use is completely optional)
- *  PEAR_Exception::addObserver('myLogger');
+ *  PEAR2_Exception::addObserver('myLogger');
  *  $test = new Test;
  *  try {
  *     $test->foo();
- *  } catch (PEAR_Exception $e) {
+ *  } catch (PEAR2_Exception $e) {
  *     print $e;
  *  }
  * </code>
@@ -93,15 +94,16 @@
  * @author     Hans Lellelid <hans@velum.net>
  * @author     Bertrand Mansion <bmansion@mamasam.com>
  * @author     Greg Beaver <cellog@php.net>
- * @copyright  1997-2006 The PHP Group
+ * @copyright  1997-2007 The PHP Group
  * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
  * @version    Release: @package_version@
  * @link       http://pear.php.net/package/PEAR
- * @since      Class available since Release 1.3.3
+ * @since      Class available since Release 0.1.0
  *
  */
-class PEAR_Exception extends Exception
+class PEAR2_Exception extends Exception
 {
+    public static $htmlError = false;
     const OBSERVER_PRINT = -2;
     const OBSERVER_TRIGGER = -4;
     const OBSERVER_DIE = -8;
@@ -116,12 +118,12 @@ class PEAR_Exception extends Exception
      *  - PEAR_Exception(string $message, int $code);
      *  - PEAR_Exception(string $message, Exception $cause);
      *  - PEAR_Exception(string $message, Exception $cause, int $code);
-     *  - PEAR_Exception(string $message, PEAR_Error $cause);
-     *  - PEAR_Exception(string $message, PEAR_Error $cause, int $code);
+     *  - PEAR_Exception(string $message, PEAR2_MultiErrors $cause);
+     *  - PEAR_Exception(string $message, PEAR2_MultiErrors $cause, int $code);
      *  - PEAR_Exception(string $message, array $causes);
      *  - PEAR_Exception(string $message, array $causes, int $code);
      * @param string exception message
-     * @param int|Exception|PEAR_Error|array|null exception cause
+     * @param int|Exception|PEAR2_MultiErrors|array|null exception cause
      * @param int|null exception code or null
      */
     public function __construct($message, $p2 = null, $p3 = null)
@@ -132,16 +134,12 @@ class PEAR_Exception extends Exception
         } elseif (is_object($p2) || is_array($p2)) {
             // using is_object allows both Exception and PEAR_Error
             if (is_object($p2) && !($p2 instanceof Exception)) {
-                if (!class_exists('PEAR_Error') || !($p2 instanceof PEAR_Error)) {
-                    throw new PEAR_Exception('exception cause must be Exception, ' .
-                        'array, or PEAR_Error');
+                if (!($p2 instanceof PEAR_MultiErrors)) {
+                    throw new PEAR2_Exception('exception cause must be Exception, ' .
+                        'array, or PEAR2_MultiErrors');
                 }
             }
             $code = $p3;
-            if (is_array($p2) && isset($p2['message'])) {
-                // fix potential problem of passing in a single warning
-                $p2 = array($p2);
-            }
             $this->cause = $p2;
         } else {
             $code = null;
@@ -205,25 +203,6 @@ class PEAR_Exception extends Exception
     }
 
     /**
-     * Return specific error information that can be used for more detailed
-     * error messages or translation.
-     *
-     * This method may be overridden in child exception classes in order
-     * to add functionality not present in PEAR_Exception and is a placeholder
-     * to define API
-     *
-     * The returned array must be an associative array of parameter => value like so:
-     * <pre>
-     * array('name' => $name, 'context' => array(...))
-     * </pre>
-     * @return array
-     */
-    public function getErrorData()
-    {
-        return array();
-    }
-
-    /**
      * Returns the exception that caused this exception to be thrown
      * @access public
      * @return Exception|array The context of the exception
@@ -251,44 +230,22 @@ class PEAR_Exception extends Exception
             }
         }
         $causes[] = $cause;
-        if ($this->cause instanceof PEAR_Exception) {
+        if ($this->cause instanceof PEAR2_Exception) {
             $this->cause->getCauseMessage($causes);
         } elseif ($this->cause instanceof Exception) {
             $causes[] = array('class'   => get_class($this->cause),
                               'message' => $this->cause->getMessage(),
                               'file' => $this->cause->getFile(),
                               'line' => $this->cause->getLine());
-        } elseif (class_exists('PEAR_Error') && $this->cause instanceof PEAR_Error) {
-            $causes[] = array('class' => get_class($this->cause),
-                              'message' => $this->cause->getMessage(),
-                              'file' => 'unknown',
-                              'line' => 'unknown');
-        } elseif (is_array($this->cause)) {
+        } elseif ($this->cause instanceof PEAR2_MultiErrors || is_array($this->cause)) {
             foreach ($this->cause as $cause) {
-                if ($cause instanceof PEAR_Exception) {
+                if ($cause instanceof PEAR2_Exception) {
                     $cause->getCauseMessage($causes);
                 } elseif ($cause instanceof Exception) {
                     $causes[] = array('class'   => get_class($cause),
                                    'message' => $cause->getMessage(),
                                    'file' => $cause->getFile(),
                                    'line' => $cause->getLine());
-                } elseif (class_exists('PEAR_Error') && $cause instanceof PEAR_Error) {
-                    $causes[] = array('class' => get_class($cause),
-                                      'message' => $cause->getMessage(),
-                                      'file' => 'unknown',
-                                      'line' => 'unknown');
-                } elseif (is_array($cause) && isset($cause['message'])) {
-                    // PEAR_ErrorStack warning
-                    $causes[] = array(
-                        'class' => $cause['package'],
-                        'message' => $cause['message'],
-                        'file' => isset($cause['context']['file']) ?
-                                            $cause['context']['file'] :
-                                            'unknown',
-                        'line' => isset($cause['context']['line']) ?
-                                            $cause['context']['line'] :
-                                            'unknown',
-                    );
                 }
             }
         }
@@ -320,7 +277,7 @@ class PEAR_Exception extends Exception
 
     public function __toString()
     {
-        if (isset($_SERVER['REQUEST_URI'])) {
+        if (self::$htmlError) {
             return $this->toHtml();
         }
         return $this->toText();
@@ -393,5 +350,4 @@ class PEAR_Exception extends Exception
         return $causeMsg . $this->getTraceAsString();
     }
 }
-
 ?>
