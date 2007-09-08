@@ -1,7 +1,7 @@
 <?php
 /* vim: set expandtab tabstop=4 shiftwidth=4 foldmethod=marker: */
 /**
- * PEAR_Exception
+ * PEAR2_Exception
  *
  * PHP versions 4 and 5
  *
@@ -73,9 +73,9 @@
  *     }
  *  }
  *
- *  function myLogger($pear_exception)
+ *  function myLogger($pear2_exception)
  *  {
- *     echo $pear_exception->getMessage();
+ *     echo $pear2_exception->getMessage();
  *  }
  *  // each time a exception is thrown the 'myLogger' will be called
  *  // (its use is completely optional)
@@ -114,14 +114,14 @@ class PEAR2_Exception extends Exception
 
     /**
      * Supported signatures:
-     *  - PEAR_Exception(string $message);
-     *  - PEAR_Exception(string $message, int $code);
-     *  - PEAR_Exception(string $message, Exception $cause);
-     *  - PEAR_Exception(string $message, Exception $cause, int $code);
-     *  - PEAR_Exception(string $message, PEAR2_MultiErrors $cause);
-     *  - PEAR_Exception(string $message, PEAR2_MultiErrors $cause, int $code);
-     *  - PEAR_Exception(string $message, array $causes);
-     *  - PEAR_Exception(string $message, array $causes, int $code);
+     *  - PEAR2_Exception(string $message);
+     *  - PEAR2_Exception(string $message, int $code);
+     *  - PEAR2_Exception(string $message, Exception $cause);
+     *  - PEAR2_Exception(string $message, Exception $cause, int $code);
+     *  - PEAR2_Exception(string $message, PEAR2_MultiErrors $cause);
+     *  - PEAR2_Exception(string $message, PEAR2_MultiErrors $cause, int $code);
+     *  - PEAR2_Exception(string $message, array $causes);
+     *  - PEAR2_Exception(string $message, array $causes, int $code);
      * @param string exception message
      * @param int|Exception|PEAR2_MultiErrors|array|null exception cause
      * @param int|null exception code or null
@@ -132,9 +132,8 @@ class PEAR2_Exception extends Exception
             $code = $p2;
             $this->cause = null;
         } elseif (is_object($p2) || is_array($p2)) {
-            // using is_object allows both Exception and PEAR_Error
-            if (is_object($p2) && !($p2 instanceof Exception)) {
-                if (!($p2 instanceof PEAR_MultiErrors)) {
+            if (!is_array($ps) && !($p2 instanceof Exception)) {
+                if (!($p2 instanceof PEAR2_MultiErrors)) {
                     throw new PEAR2_Exception('exception cause must be Exception, ' .
                         'array, or PEAR2_MultiErrors');
                 }
@@ -151,8 +150,8 @@ class PEAR2_Exception extends Exception
 
     /**
      * @param mixed $callback  - A valid php callback, see php func is_callable()
-     *                         - A PEAR_Exception::OBSERVER_* constant
-     *                         - An array(const PEAR_Exception::OBSERVER_*,
+     *                         - A PEAR2_Exception::OBSERVER_* constant
+     *                         - An array(const PEAR2_Exception::OBSERVER_*,
      *                           mixed $options)
      * @param string $label    The name of the observer. Use this if you want
      *                         to remove it later with removeObserver()
