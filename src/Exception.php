@@ -132,7 +132,7 @@ class PEAR2_Exception extends Exception
             $code = $p2;
             $this->cause = null;
         } elseif (is_object($p2) || is_array($p2)) {
-            if (!is_array($ps) && !($p2 instanceof Exception)) {
+            if (!is_array($p2) && !($p2 instanceof Exception)) {
                 if (!($p2 instanceof PEAR2_MultiErrors)) {
                     throw new PEAR2_Exception('exception cause must be Exception, ' .
                         'array, or PEAR2_MultiErrors');
