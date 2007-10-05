@@ -1,0 +1,7 @@
+PEAR2_Exception is the standard exception class for PEAR2.
+In addition to supporting the default signature of the built-in
+Exception class, PEAR2_Exception also supports passing a
+cause of an exception, which can be another exception object
+or a PEAR2_MultiErrors object.  The error messages of the causes
+are used when constructing the error message displayed when
+converting PEAR2_Exception to a string.
