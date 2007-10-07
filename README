@@ -5,3 +5,6 @@ cause of an exception, which can be another exception object
 or a PEAR2_MultiErrors object.  The error messages of the causes
 are used when constructing the error message displayed when
 converting PEAR2_Exception to a string.
+
+PEAR2_Exception should always be extended by your own custom exception
+class for the package.

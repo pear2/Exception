@@ -101,7 +101,7 @@
  * @since      Class available since Release 0.1.0
  *
  */
-class PEAR2_Exception extends Exception
+abstract class PEAR2_Exception extends Exception
 {
     public static $htmlError = false;
     const OBSERVER_PRINT = -2;
