@@ -61,7 +61,7 @@ class for the package.</description>
     <min>5.2.0</min>
    </php>
    <pearinstaller>
-    <min>2.0.0</min>
+    <min>2.0.0a1</min>
    </pearinstaller>
   </required>
  </dependencies>
