@@ -134,7 +134,7 @@ abstract class PEAR2_Exception extends Exception
         } elseif (is_object($p2) || is_array($p2)) {
             if (!is_array($p2) && !($p2 instanceof Exception)) {
                 if (!($p2 instanceof PEAR2_MultiErrors)) {
-                    throw new PEAR2_Exception('exception cause must be Exception, ' .
+                    throw new Exception('exception cause must be Exception, ' .
                         'array, or PEAR2_MultiErrors');
                 }
             }
@@ -143,6 +143,9 @@ abstract class PEAR2_Exception extends Exception
         } else {
             $code = null;
             $this->cause = null;
+        }
+        if (!is_string($message)) {
+            throw new Exception('exception message must be a string, was ' . gettype($message));
         }
         parent::__construct($message, $code);
         $this->signal();
