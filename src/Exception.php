@@ -35,7 +35,7 @@
  * - Pretty and informative error messages
  * - Added more context info available (like class, method or cause)
  * - cause can be a PEAR2_Exception or an array of mixed
- *   PEAR2_Exceptions or a PEAR2_MultiErrors
+ *   PEAR2_Exceptions or a \pear2\MultiErrors
  * - callbacks for specific exception classes and their children
  *
  * 2) Ideas:
@@ -101,7 +101,8 @@
  * @since      Class available since Release 0.1.0
  *
  */
-abstract class PEAR2_Exception extends Exception
+namespace pear2;
+abstract class Exception extends \Exception
 {
     public static $htmlError = false;
     const OBSERVER_PRINT = -2;
@@ -118,12 +119,12 @@ abstract class PEAR2_Exception extends Exception
      *  - PEAR2_Exception(string $message, int $code);
      *  - PEAR2_Exception(string $message, Exception $cause);
      *  - PEAR2_Exception(string $message, Exception $cause, int $code);
-     *  - PEAR2_Exception(string $message, PEAR2_MultiErrors $cause);
-     *  - PEAR2_Exception(string $message, PEAR2_MultiErrors $cause, int $code);
+     *  - PEAR2_Exception(string $message, \pear2\MultiErrors $cause);
+     *  - PEAR2_Exception(string $message, \pear2\MultiErrors $cause, int $code);
      *  - PEAR2_Exception(string $message, array $causes);
      *  - PEAR2_Exception(string $message, array $causes, int $code);
      * @param string exception message
-     * @param int|Exception|PEAR2_MultiErrors|array|null exception cause
+     * @param int|Exception|\pear2\MultiErrors|array|null exception cause
      * @param int|null exception code or null
      */
     public function __construct($message, $p2 = null, $p3 = null)
@@ -132,10 +133,10 @@ abstract class PEAR2_Exception extends Exception
             $code = $p2;
             $this->cause = null;
         } elseif (is_object($p2) || is_array($p2)) {
-            if (!is_array($p2) && !($p2 instanceof Exception)) {
-                if (!($p2 instanceof PEAR2_MultiErrors)) {
-                    throw new Exception('exception cause must be Exception, ' .
-                        'array, or PEAR2_MultiErrors');
+            if (!is_array($p2) && !($p2 instanceof \Exception)) {
+                if (!($p2 instanceof \pear2\MultiErrors)) {
+                    throw new \Exception('exception cause must be Exception, ' .
+                        'array, or \pear2\MultiErrors');
                 }
             }
             $code = $p3;
@@ -145,7 +146,7 @@ abstract class PEAR2_Exception extends Exception
             $this->cause = null;
         }
         if (!is_string($message)) {
-            throw new Exception('exception message must be a string, was ' . gettype($message));
+            throw new \Exception('exception message must be a string, was ' . gettype($message));
         }
         parent::__construct($message, $code);
         $this->signal();
@@ -232,18 +233,18 @@ abstract class PEAR2_Exception extends Exception
             }
         }
         $causes[] = $cause;
-        if ($this->cause instanceof PEAR2_Exception) {
+        if ($this->cause instanceof self) {
             $this->cause->getCauseMessage($causes);
-        } elseif ($this->cause instanceof Exception) {
+        } elseif ($this->cause instanceof \Exception) {
             $causes[] = array('class'   => get_class($this->cause),
                               'message' => $this->cause->getMessage(),
                               'file' => $this->cause->getFile(),
                               'line' => $this->cause->getLine());
-        } elseif ($this->cause instanceof PEAR2_MultiErrors || is_array($this->cause)) {
+        } elseif ($this->cause instanceof \pear2\MultiErrors || is_array($this->cause)) {
             foreach ($this->cause as $cause) {
-                if ($cause instanceof PEAR2_Exception) {
+                if ($cause instanceof self) {
                     $cause->getCauseMessage($causes);
-                } elseif ($cause instanceof Exception) {
+                } elseif ($cause instanceof \Exception) {
                     $causes[] = array('class'   => get_class($cause),
                                    'message' => $cause->getMessage(),
                                    'file' => $cause->getFile(),

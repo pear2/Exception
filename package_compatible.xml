@@ -51,9 +51,7 @@ class for the package.</description>
  <notes>Initial Release</notes>
  <contents>
   <dir name="/">
-   <dir name="src" baseinstalldir="pear2">
-    <file role="php" name="Exception.php"/>
-   </dir>
+   <file role="php" name="php/pear2/Exception.php"/>
   </dir>
  </contents>
  <dependencies>
@@ -62,9 +60,13 @@ class for the package.</description>
     <min>5.2.0</min>
    </php>
    <pearinstaller>
-    <min>2.0.0a1</min>
+    <min>1.4.8</min>
    </pearinstaller>
   </required>
  </dependencies>
- <phprelease/>
+ <phprelease>
+  <filelist>
+   <install name="php/pear2/Exception.php" as="pear2/Exception.php"/>
+  </filelist>
+ </phprelease>
 </package>
