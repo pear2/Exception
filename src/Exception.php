@@ -108,7 +108,6 @@ abstract class Exception extends \Exception
     const OBSERVER_PRINT = -2;
     const OBSERVER_TRIGGER = -4;
     const OBSERVER_DIE = -8;
-    protected $cause;
     private static $_observers = array();
     private static $_uniqueid = 0;
     private $_trace;
@@ -119,36 +118,31 @@ abstract class Exception extends \Exception
      *  - PEAR2_Exception(string $message, int $code);
      *  - PEAR2_Exception(string $message, Exception $cause);
      *  - PEAR2_Exception(string $message, Exception $cause, int $code);
-     *  - PEAR2_Exception(string $message, \pear2\MultiErrors $cause);
-     *  - PEAR2_Exception(string $message, \pear2\MultiErrors $cause, int $code);
-     *  - PEAR2_Exception(string $message, array $causes);
-     *  - PEAR2_Exception(string $message, array $causes, int $code);
+     *  - PEAR2_Exception(string $message, pear2\MultiErrors $cause);
+     *  - PEAR2_Exception(string $message, pear2\MultiErrors $cause, int $code);
      * @param string exception message
-     * @param int|Exception|\pear2\MultiErrors|array|null exception cause
+     * @param int|Exception|pear2\MultiErrors|null exception cause
      * @param int|null exception code or null
      */
     public function __construct($message, $p2 = null, $p3 = null)
     {
         if (is_int($p2)) {
             $code = $p2;
-            $this->cause = null;
-        } elseif (is_object($p2) || is_array($p2)) {
-            if (!is_array($p2) && !($p2 instanceof \Exception)) {
-                if (!($p2 instanceof \pear2\MultiErrors)) {
-                    throw new \Exception('exception cause must be Exception, ' .
-                        'array, or \pear2\MultiErrors');
-                }
+            $cause = null;
+        } elseif (is_object($p2)) {
+            if (!($p2 instanceof \Exception)) {
+                throw new \Exception('exception cause must be Exception, or pear2\MultiErrors');
             }
             $code = $p3;
-            $this->cause = $p2;
+            $cause = $p2;
         } else {
             $code = null;
-            $this->cause = null;
+            $cause = null;
         }
         if (!is_string($message)) {
             throw new \Exception('exception message must be a string, was ' . gettype($message));
         }
-        parent::__construct($message, $code);
+        parent::__construct($message, $code, $cause);
         $this->signal();
     }
 
@@ -212,7 +206,7 @@ abstract class Exception extends \Exception
      */
     public function getCause()
     {
-        return $this->cause;
+        return $this->getPrevious();
     }
 
     /**
@@ -233,15 +227,10 @@ abstract class Exception extends \Exception
             }
         }
         $causes[] = $cause;
-        if ($this->cause instanceof self) {
-            $this->cause->getCauseMessage($causes);
-        } elseif ($this->cause instanceof \Exception) {
-            $causes[] = array('class'   => get_class($this->cause),
-                              'message' => $this->cause->getMessage(),
-                              'file' => $this->cause->getFile(),
-                              'line' => $this->cause->getLine());
-        } elseif ($this->cause instanceof \pear2\MultiErrors || is_array($this->cause)) {
-            foreach ($this->cause as $cause) {
+        if ($this->getPrevious() instanceof self) {
+            $this->getPrevious()->getCauseMessage($causes);
+        } elseif ($this->getPrevious() instanceof \pear2\MultiErrors) {
+            foreach ($this->getPrevious() as $cause) {
                 if ($cause instanceof self) {
                     $cause->getCauseMessage($causes);
                 } elseif ($cause instanceof \Exception) {
@@ -251,6 +240,11 @@ abstract class Exception extends \Exception
                                    'line' => $cause->getLine());
                 }
             }
+        } elseif ($this->getPrevious() instanceof \Exception) {
+            $causes[] = array('class'   => get_class($this->getPrevious()),
+                              'message' => $this->getPrevious()->getMessage(),
+                              'file' => $this->getPrevious()->getFile(),
+                              'line' => $this->getPrevious()->getLine());
         }
     }
 
