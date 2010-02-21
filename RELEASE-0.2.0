@@ -1,0 +1,2 @@
+- Remove getCause() as it just uses the built in getPrevious() that was added in PHP 5.3
+- Remove getUniqueId as it's used anywhere

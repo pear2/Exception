@@ -109,7 +109,6 @@ abstract class Exception extends \Exception
     const OBSERVER_TRIGGER = -4;
     const OBSERVER_DIE = -8;
     private static $_observers = array();
-    private static $_uniqueid = 0;
     private $_trace;
 
     /**
@@ -139,9 +138,11 @@ abstract class Exception extends \Exception
             $code = null;
             $cause = null;
         }
+
         if (!is_string($message)) {
             throw new \Exception('exception message must be a string, was ' . gettype($message));
         }
+
         parent::__construct($message, $code, $cause);
         $this->signal();
     }
@@ -164,14 +165,6 @@ abstract class Exception extends \Exception
         unset(self::$_observers[$label]);
     }
 
-    /**
-     * @return int unique identifier for an observer
-     */
-    public static function getUniqueId()
-    {
-        return self::$_uniqueid++;
-    }
-
     private function signal()
     {
         foreach (self::$_observers as $func) {
@@ -179,6 +172,7 @@ abstract class Exception extends \Exception
                 call_user_func($func, $this);
                 continue;
             }
+
             settype($func, 'array');
             switch ($func[0]) {
                 case self::OBSERVER_PRINT :
@@ -200,16 +194,6 @@ abstract class Exception extends \Exception
     }
 
     /**
-     * Returns the exception that caused this exception to be thrown
-     * @access public
-     * @return Exception|array The context of the exception
-     */
-    public function getCause()
-    {
-        return $this->getPrevious();
-    }
-
-    /**
      * Function must be public to call on caused exceptions
      * @param array
      */
@@ -220,12 +204,14 @@ abstract class Exception extends \Exception
                        'message' => $this->message,
                        'file' => 'unknown',
                        'line' => 'unknown');
+
         if (isset($trace[0])) {
             if (isset($trace[0]['file'])) {
                 $cause['file'] = $trace[0]['file'];
                 $cause['line'] = $trace[0]['line'];
             }
         }
+
         $causes[] = $cause;
         if ($this->getPrevious() instanceof self) {
             $this->getPrevious()->getCauseMessage($causes);
@@ -249,7 +235,7 @@ abstract class Exception extends \Exception
     }
 
     public function getTraceSafe()
-    {   
+    {
         if (!isset($this->_trace)) {
             $this->_trace = $this->getTrace();
             if (empty($this->_trace)) {
@@ -304,6 +290,7 @@ abstract class Exception extends \Exception
             if (!empty($v['class'])) {
                 $html .= $v['class'] . $v['type'];
             }
+
             $html .= $v['function'];
             $args = array();
             if (!empty($v['args'])) {
@@ -321,12 +308,14 @@ abstract class Exception extends \Exception
                     }
                 }
             }
+
             $html .= '(' . implode(', ',$args) . ')'
                    . '</td>'
                    . '<td>' . (isset($v['file']) ? $v['file'] : 'unknown')
                    . ':' . (isset($v['line']) ? $v['line'] : 'unknown')
                    . '</td></tr>' . "\n";
         }
+
         $html .= '<tr><td align="center">' . ($k+1) . '</td>'
                . '<td>{main}</td>'
                . '<td>&nbsp;</td></tr>' . "\n"
@@ -344,7 +333,7 @@ abstract class Exception extends \Exception
                    . $cause['message'] . ' in ' . $cause['file']
                    . ' on line ' . $cause['line'] . "\n";
         }
+
         return $causeMsg . $this->getTraceAsString();
     }
 }
-?>
