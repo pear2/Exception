@@ -12,8 +12,7 @@
  * @author     Bertrand Mansion <bmansion@mamasam.com>
  * @author     Greg Beaver <cellog@php.net>
  * @copyright  1997-2007 The PHP Group
- * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
- * @version    CVS: $Id: Exception.php,v 1.28 2007/05/07 01:58:54 cellog Exp $
+ * @license    http://opensource.org/licenses/bsd-license.php New BSD License
  * @link       http://pear.php.net/package/PEAR
  * @since      File available since Release 0.1.0
  */
