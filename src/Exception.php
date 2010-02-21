@@ -32,37 +32,12 @@
  *
  * - Nestable exceptions (throw new PEAR2_Exception($msg, $prev_exception))
  * - Definable triggers, shot when exceptions occur
- * - Pretty and informative error messages
  * - Added more context info available (like class, method or cause)
  * - cause can be a PEAR2_Exception or an array of mixed
  *   PEAR2_Exceptions or a \pear2\MultiErrors
  * - callbacks for specific exception classes and their children
  *
- * 2) Ideas:
- *
- * - Maybe a way to define a 'template' for the output
- *
- * 3) Inherited properties from PHP Exception Class:
- *
- * protected $message
- * protected $code
- * protected $line
- * protected $file
- * private   $trace
- *
- * 4) Inherited methods from PHP Exception Class:
- *
- * __clone
- * __construct
- * getMessage
- * getCode
- * getFile
- * getLine
- * getTraceSafe
- * getTraceSafeAsString
- * __toString
- *
- * 5) Usage example
+ * 2) Usage example
  *
  * <code>
  * class PEAR2_MyPackage_Exception extends PEAR2_Exception {}
@@ -104,7 +79,6 @@
 namespace pear2;
 abstract class Exception extends \Exception
 {
-    public static $htmlError = false;
     const OBSERVER_PRINT = -2;
     const OBSERVER_TRIGGER = -4;
     const OBSERVER_DIE = -8;
@@ -125,18 +99,16 @@ abstract class Exception extends \Exception
      */
     public function __construct($message, $p2 = null, $p3 = null)
     {
+        $code = $cause = null;
         if (is_int($p2)) {
             $code = $p2;
-            $cause = null;
         } elseif (is_object($p2)) {
             if (!($p2 instanceof \Exception)) {
                 throw new \Exception('exception cause must be Exception, or pear2\MultiErrors');
             }
-            $code = $p3;
+
+            $code  = $p3;
             $cause = $p2;
-        } else {
-            $code = null;
-            $cause = null;
         }
 
         if (!is_string($message)) {
@@ -200,16 +172,16 @@ abstract class Exception extends \Exception
     public function getCauseMessage(&$causes)
     {
         $trace = $this->getTraceSafe();
-        $cause = array('class'   => get_class($this),
-                       'message' => $this->message,
-                       'file' => 'unknown',
-                       'line' => 'unknown');
+        $cause = array(
+            'class'   => get_class($this),
+            'message' => $this->message,
+            'file'    => 'unknown',
+            'line'    => 'unknown'
+        );
 
-        if (isset($trace[0])) {
-            if (isset($trace[0]['file'])) {
-                $cause['file'] = $trace[0]['file'];
-                $cause['line'] = $trace[0]['line'];
-            }
+        if (isset($trace[0]) && isset($trace[0]['file'])) {
+            $cause['file'] = $trace[0]['file'];
+            $cause['line'] = $trace[0]['line'];
         }
 
         $causes[] = $cause;
@@ -220,17 +192,21 @@ abstract class Exception extends \Exception
                 if ($cause instanceof self) {
                     $cause->getCauseMessage($causes);
                 } elseif ($cause instanceof \Exception) {
-                    $causes[] = array('class'   => get_class($cause),
-                                   'message' => $cause->getMessage(),
-                                   'file' => $cause->getFile(),
-                                   'line' => $cause->getLine());
+                    $causes[] = array(
+                        'class'   => get_class($cause),
+                        'message' => $cause->getMessage(),
+                        'file'    => $cause->getFile(),
+                        'line'    => $cause->getLine()
+                    );
                 }
             }
         } elseif ($this->getPrevious() instanceof \Exception) {
-            $causes[] = array('class'   => get_class($this->getPrevious()),
-                              'message' => $this->getPrevious()->getMessage(),
-                              'file' => $this->getPrevious()->getFile(),
-                              'line' => $this->getPrevious()->getLine());
+            $causes[] = array(
+                'class'   => get_class($this->getPrevious()),
+                'message' => $this->getPrevious()->getMessage(),
+                'file'    => $this->getPrevious()->getFile(),
+                'line'    => $this->getPrevious()->getLine()
+            );
         }
     }
 
@@ -243,6 +219,7 @@ abstract class Exception extends \Exception
                 $this->_trace = array($backtrace[count($backtrace)-1]);
             }
         }
+
         return $this->_trace;
     }
 
@@ -263,6 +240,7 @@ abstract class Exception extends \Exception
         if (self::$htmlError) {
             return $this->toHtml();
         }
+
         return $this->toText();
     }
 
