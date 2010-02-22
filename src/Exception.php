@@ -111,7 +111,12 @@ abstract class Exception extends \Exception
         }
 
         parent::__construct($message, $code, $cause);
-        $this->signal();
+
+        foreach (self::$_observers as $func) {
+            if (is_callable($func)) {
+                call_user_func($func, $this);
+            }
+        }
     }
 
     /**
@@ -130,15 +135,6 @@ abstract class Exception extends \Exception
     public static function removeObserver($label = 'default')
     {
         unset(self::$_observers[$label]);
-    }
-
-    private function signal()
-    {
-        foreach (self::$_observers as $func) {
-            if (is_callable($func)) {
-                call_user_func($func, $this);
-            }
-        }
     }
 
     /**
