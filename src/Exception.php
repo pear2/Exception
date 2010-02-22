@@ -13,7 +13,7 @@
  * @author     Greg Beaver <cellog@php.net>
  * @copyright  1997-2007 The PHP Group
  * @license    http://opensource.org/licenses/bsd-license.php New BSD License
- * @link       http://pear.php.net/package/PEAR
+ * @link       http://pear2.php.net/PEAR2_Exception
  * @since      File available since Release 0.1.0
  */
 
@@ -69,7 +69,7 @@
  * @copyright  1997-2007 The PHP Group
  * @license    http://opensource.org/licenses/bsd-license.php New BSD License
  * @version    Release: @package_version@
- * @link       http://pear.php.net/package/PEAR
+ * @link       http://pear2.php.net/PEAR2_Exception
  * @since      Class available since Release 0.1.0
  *
  */
