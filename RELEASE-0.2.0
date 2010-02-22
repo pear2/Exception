@@ -6,4 +6,5 @@
   OBSERVER_PRINT, OBSERVER_TRIGGER, OBSERVER_DIE
   This can be achieved by writing a custom callback function, using the appropriate printf(),
   trigger_error and die() to achieve the same result.
+- Removed getErroClass and getErrorMethod as it can be easily gotten from getTrace/getTraceSafe first array element
 - Add the proper LICENSE file and move Exception.php to the NEW BSD license as the package.xml already defines
