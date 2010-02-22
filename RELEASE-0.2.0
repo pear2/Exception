@@ -1,2 +1,9 @@
-- Remove getCause() as it just uses the built in getPrevious() that was added in PHP 5.3
-- Remove getUniqueId as it's used anywhere
+- Removed getCause() as it just uses the built in getPrevious() that was added in PHP 5.3
+- Removed getUniqueId as it's used anywhere
+- Removed toHtml, toText and __toString (which only handled calling the former two).
+  People should implement their owny decorator calls.
+- Removed the built in outputs of the observer functions. Those where the class constants
+  OBSERVER_PRINT, OBSERVER_TRIGGER, OBSERVER_DIE
+  This can be achieved by writing a custom callback function, using the appropriate printf(),
+  trigger_error and die() to achieve the same result.
+- Add the proper LICENSE file and move Exception.php to the NEW BSD license as the package.xml already defines
