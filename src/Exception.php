@@ -195,18 +195,6 @@ abstract class Exception extends \Exception
         return $this->_trace;
     }
 
-    public function getErrorClass()
-    {
-        $trace = $this->getTraceSafe();
-        return $trace[0]['class'];
-    }
-
-    public function getErrorMethod()
-    {
-        $trace = $this->getTraceSafe();
-        return $trace[0]['function'];
-    }
-
     public function __toString()
     {
         if (self::$htmlError) {
