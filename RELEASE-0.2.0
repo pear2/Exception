@@ -8,3 +8,35 @@
   trigger_error and die() to achieve the same result.
 - Removed getErroClass and getErrorMethod as it can be easily gotten from getTrace/getTraceSafe first array element
 - Add the proper LICENSE file and move Exception.php to the NEW BSD license as the package.xml already defines
+- Removed __toString, toText and toHtml. For those wanting to get pretty outputs they can use this approach:
+
+    $causes = array();
+    $this->getCauseMessage($causes);
+    foreach ($causes as $i => $cause) {
+        var_dump($cause);
+    }
+
+    And combine that with getTraceSafe() or getTraceAsString() if needed.
+
+    Put all that in a function and use set_exception_handler('exceptionHandler'); or similar to process
+    all Exceptions.
+
+    Example code or see the removed code at http://svn.php.net/viewvc/pear2/Exception/trunk/src/Exception.php?r1=295348&r2=295352 :
+
+    function exceptionHandler($e)
+    {
+        if ($e instanceof \pear2\Exception) {
+            $causes = array();
+            $e->getCauseMessage($causes);
+            $causeMsg = '';
+            foreach ($causes as $i => $cause) {
+                $causeMsg .= str_repeat(' ', $i) . $cause['class'] . ': '
+                       . $cause['message'] . "\n";
+            }
+            echo $causeMsg;
+        } else {
+            echo $e->getMessage(), "\n";
+        }
+    }
+
+    set_exception_handler('exceptionHandler');
