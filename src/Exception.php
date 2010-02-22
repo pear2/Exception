@@ -76,7 +76,6 @@
 namespace pear2;
 abstract class Exception extends \Exception
 {
-    static $htmlError = false;
     private static $_observers = array();
     private $_trace;
 
@@ -193,85 +192,5 @@ abstract class Exception extends \Exception
         }
 
         return $this->_trace;
-    }
-
-    public function __toString()
-    {
-        if (self::$htmlError) {
-            return $this->toHtml();
-        }
-
-        return $this->toText();
-    }
-
-    public function toHtml()
-    {
-        $trace = $this->getTraceSafe();
-        $causes = array();
-        $this->getCauseMessage($causes);
-        $html =  '<table border="1" cellspacing="0">' . "\n";
-        foreach ($causes as $i => $cause) {
-            $html .= '<tr><td colspan="3" bgcolor="#ff9999">'
-               . str_repeat('-', $i) . ' <b>' . $cause['class'] . '</b>: '
-               . htmlspecialchars($cause['message']) . ' in <b>' . $cause['file'] . '</b> '
-               . 'on line <b>' . $cause['line'] . '</b>'
-               . "</td></tr>\n";
-        }
-        $html .= '<tr><td colspan="3" bgcolor="#aaaaaa" align="center"><b>Exception trace</b></td></tr>' . "\n"
-               . '<tr><td align="center" bgcolor="#cccccc" width="20"><b>#</b></td>'
-               . '<td align="center" bgcolor="#cccccc"><b>Function</b></td>'
-               . '<td align="center" bgcolor="#cccccc"><b>Location</b></td></tr>' . "\n";
-
-        foreach ($trace as $k => $v) {
-            $html .= '<tr><td align="center">' . $k . '</td>'
-                   . '<td>';
-            if (!empty($v['class'])) {
-                $html .= $v['class'] . $v['type'];
-            }
-
-            $html .= $v['function'];
-            $args = array();
-            if (!empty($v['args'])) {
-                foreach ($v['args'] as $arg) {
-                    if (is_null($arg)) $args[] = 'null';
-                    elseif (is_array($arg)) $args[] = 'Array';
-                    elseif (is_object($arg)) $args[] = 'Object('.get_class($arg).')';
-                    elseif (is_bool($arg)) $args[] = $arg ? 'true' : 'false';
-                    elseif (is_int($arg) || is_double($arg)) $args[] = $arg;
-                    else {
-                        $arg = (string)$arg;
-                        $str = htmlspecialchars(substr($arg, 0, 16));
-                        if (strlen($arg) > 16) $str .= '&hellip;';
-                        $args[] = "'" . $str . "'";
-                    }
-                }
-            }
-
-            $html .= '(' . implode(', ',$args) . ')'
-                   . '</td>'
-                   . '<td>' . (isset($v['file']) ? $v['file'] : 'unknown')
-                   . ':' . (isset($v['line']) ? $v['line'] : 'unknown')
-                   . '</td></tr>' . "\n";
-        }
-
-        $html .= '<tr><td align="center">' . ($k+1) . '</td>'
-               . '<td>{main}</td>'
-               . '<td>&nbsp;</td></tr>' . "\n"
-               . '</table>';
-        return $html;
-    }
-
-    public function toText()
-    {
-        $causes = array();
-        $this->getCauseMessage($causes);
-        $causeMsg = '';
-        foreach ($causes as $i => $cause) {
-            $causeMsg .= str_repeat(' ', $i) . $cause['class'] . ': '
-                   . $cause['message'] . ' in ' . $cause['file']
-                   . ' on line ' . $cause['line'] . "\n";
-        }
-
-        return $causeMsg . $this->getTraceAsString();
     }
 }
