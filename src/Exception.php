@@ -33,27 +33,31 @@
  * 2) Usage example
  *
  * <code>
- * class PEAR2_MyPackage_Exception extends PEAR2_Exception {}
- *  class Test {
+ * namespace pear2;
+ * class PEAR2_MyPackage_Exception extends Exception {}
+ *
+ * class Test
+ * {
  *     function foo()
  *     {
- *         throw new PEAR2_MyPackage_Exception('Error Message', ERROR_CODE);
+ *         throw new PEAR2_MyPackage_Exception('Error Message', 4);
  *     }
- *  }
+ * }
  *
- *  function myLogger($pear2_exception)
- *  {
- *     echo $pear2_exception->getMessage();
- *  }
- *  // each time a exception is thrown the 'myLogger' will be called
- *  // (its use is completely optional)
- *  PEAR2_Exception::addObserver('myLogger');
- *  $test = new Test;
- *  try {
+ * function myLogger($exception)
+ * {
+ *     echo 'Logger: ' . $exception->getMessage() . "\n";
+ * }
+ *
+ * // each time a exception is thrown the 'myLogger' will be called
+ * // (its use is completely optional)
+ * Exception::addObserver('\pear2\myLogger');
+ * $test = new Test;
+ * try {
  *     $test->foo();
- *  } catch (PEAR2_Exception $e) {
+ * } catch (\Exception $e) {
  *     print $e;
- *  }
+ * }
  * </code>
  *
  * @category   pear
