@@ -72,9 +72,7 @@
 namespace pear2;
 abstract class Exception extends \Exception
 {
-    const OBSERVER_PRINT = -2;
-    const OBSERVER_TRIGGER = -4;
-    const OBSERVER_DIE = -8;
+    static $htmlError = false;
     private static $_observers = array();
     private $_trace;
 
@@ -135,25 +133,6 @@ abstract class Exception extends \Exception
         foreach (self::$_observers as $func) {
             if (is_callable($func)) {
                 call_user_func($func, $this);
-                continue;
-            }
-
-            settype($func, 'array');
-            switch ($func[0]) {
-                case self::OBSERVER_PRINT :
-                    $f = (isset($func[1])) ? $func[1] : '%s';
-                    printf($f, $this->getMessage());
-                    break;
-                case self::OBSERVER_TRIGGER :
-                    $f = (isset($func[1])) ? $func[1] : E_USER_NOTICE;
-                    trigger_error($this->getMessage(), $f);
-                    break;
-                case self::OBSERVER_DIE :
-                    $f = (isset($func[1])) ? $func[1] : '%s';
-                    die(printf($f, $this->getMessage()));
-                    break;
-                default:
-                    trigger_error('invalid observer type', E_USER_WARNING);
             }
         }
     }
@@ -162,7 +141,7 @@ abstract class Exception extends \Exception
      * Function must be public to call on caused exceptions
      * @param array
      */
-    public function getCauseMessage(&$causes)
+    public function getCauseMessage(array &$causes)
     {
         $trace = $this->getTraceSafe();
         $cause = array(
