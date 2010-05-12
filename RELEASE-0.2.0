@@ -25,7 +25,7 @@
 
     function exceptionHandler($e)
     {
-        if ($e instanceof \pear2\Exception) {
+        if ($e instanceof \PEAR2\Exception) {
             $causes = array();
             $e->getCauseMessage($causes);
             $causeMsg = '';

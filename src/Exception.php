@@ -27,13 +27,13 @@
  * - Definable triggers, shot when exceptions occur
  * - Added more context info available (like class, method or cause)
  * - cause can be a PEAR2_Exception or an array of mixed
- *   PEAR2_Exceptions or a \pear2\MultiErrors
+ *   PEAR2_Exceptions or a \PEAR2\MultiErrors
  * - callbacks for specific exception classes and their children
  *
  * 2) Usage example
  *
  * <code>
- * namespace pear2;
+ * namespace PEAR2;
  * class PEAR2_MyPackage_Exception extends Exception {}
  *
  * class Test
@@ -51,7 +51,7 @@
  *
  * // each time a exception is thrown the 'myLogger' will be called
  * // (its use is completely optional)
- * Exception::addObserver('\pear2\myLogger');
+ * Exception::addObserver('\PEAR2\myLogger');
  * $test = new Test;
  * try {
  *     $test->foo();
@@ -73,7 +73,7 @@
  * @since      Class available since Release 0.1.0
  *
  */
-namespace pear2;
+namespace PEAR2;
 abstract class Exception extends \Exception
 {
     private static $_observers = array();
@@ -85,10 +85,10 @@ abstract class Exception extends \Exception
      *  - PEAR2_Exception(string $message, int $code);
      *  - PEAR2_Exception(string $message, Exception $cause);
      *  - PEAR2_Exception(string $message, Exception $cause, int $code);
-     *  - PEAR2_Exception(string $message, pear2\MultiErrors $cause);
-     *  - PEAR2_Exception(string $message, pear2\MultiErrors $cause, int $code);
+     *  - PEAR2_Exception(string $message, PEAR2\MultiErrors $cause);
+     *  - PEAR2_Exception(string $message, PEAR2\MultiErrors $cause, int $code);
      * @param string exception message
-     * @param int|Exception|pear2\MultiErrors|null exception cause
+     * @param int|Exception|PEAR2\MultiErrors|null exception cause
      * @param int|null exception code or null
      */
     public function __construct($message, $p2 = null, $p3 = null)
@@ -98,7 +98,7 @@ abstract class Exception extends \Exception
             $code = $p2;
         } elseif (is_object($p2)) {
             if (!($p2 instanceof \Exception)) {
-                throw new \Exception('exception cause must be Exception, or pear2\MultiErrors');
+                throw new \Exception('exception cause must be Exception, or PEAR2\MultiErrors');
             }
 
             $code  = $p3;
@@ -158,7 +158,7 @@ abstract class Exception extends \Exception
         $causes[] = $cause;
         if ($this->getPrevious() instanceof self) {
             $this->getPrevious()->getCauseMessage($causes);
-        } elseif ($this->getPrevious() instanceof \pear2\MultiErrors) {
+        } elseif ($this->getPrevious() instanceof \PEAR2\MultiErrors) {
             foreach ($this->getPrevious() as $cause) {
                 if ($cause instanceof self) {
                     $cause->getCauseMessage($causes);

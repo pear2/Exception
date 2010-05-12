@@ -2,16 +2,16 @@
 <package version="2.1" xmlns="http://pear.php.net/dtd/package-2.1" xmlns:tasks="http://pear.php.net/dtd/tasks-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pear.php.net/dtd/tasks-1.0     http://pear.php.net/dtd/tasks-1.0.xsd     http://pear.php.net/dtd/package-2.1     http://pear.php.net/dtd/package-2.1.xsd">
  <name>PEAR2_Exception</name>
  <channel>pear2.php.net</channel>
- <summary>pear2\Exception is the standard exception class for PEAR2.
+ <summary>PEAR2\Exception is the standard exception class for PEAR2.
 </summary>
  <description>In addition to supporting the default signature of the built-in
-Exception class, pear2\Exception also supports passing a
+Exception class, PEAR2\Exception also supports passing a
 cause of an exception, which can be another exception object
 or a PEAR2_MultiErrors object.  The error messages of the causes
 are used when constructing the error message displayed when
-converting pear2\Exception to a string.
+converting PEAR2\Exception to a string.
 
-pear2\Exception should always be extended by your own custom exception
+PEAR2\Exception should always be extended by your own custom exception
 class for the package.</description>
  <lead>
   <name>Gregory Beaver</name>
@@ -51,7 +51,7 @@ class for the package.</description>
  <notes>Initial Release</notes>
  <contents>
   <dir name="/">
-   <dir name="src" baseinstalldir="pear2">
+   <dir name="src" baseinstalldir="PEAR2">
     <file role="php" name="Exception.php"/>
    </dir>
   </dir>
