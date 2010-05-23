@@ -1,3 +1,4 @@
+- Covert namespace to PEAR2
 - Removed getCause() as it just uses the built in getPrevious() that was added in PHP 5.3
 - Removed getUniqueId as it's used anywhere
 - Removed toHtml, toText and __toString (which only handled calling the former two).
