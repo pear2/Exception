@@ -30,36 +30,6 @@
  *   PEAR2_Exceptions or a \PEAR2\MultiErrors
  * - callbacks for specific exception classes and their children
  *
- * 2) Usage example
- *
- * <code>
- * namespace PEAR2;
- * class PEAR2_MyPackage_Exception extends Exception {}
- *
- * class Test
- * {
- *     function foo()
- *     {
- *         throw new PEAR2_MyPackage_Exception('Error Message', 4);
- *     }
- * }
- *
- * function myLogger($exception)
- * {
- *     echo 'Logger: ' . $exception->getMessage() . "\n";
- * }
- *
- * // each time a exception is thrown the 'myLogger' will be called
- * // (its use is completely optional)
- * Exception::addObserver('\PEAR2\myLogger');
- * $test = new Test;
- * try {
- *     $test->foo();
- * } catch (\Exception $e) {
- *     print $e;
- * }
- * </code>
- *
  * @category   pear
  * @package    PEAR
  * @author     Tomas V.V.Cox <cox@idecnet.com>
@@ -76,9 +46,6 @@
 namespace PEAR2;
 abstract class Exception extends \Exception
 {
-    private static $_observers = array();
-    private $_trace;
-
     /**
      * Supported signatures:
      *  - PEAR2_Exception(string $message);
@@ -110,30 +77,6 @@ abstract class Exception extends \Exception
         }
 
         parent::__construct($message, $code, $cause);
-
-        foreach (self::$_observers as $func) {
-            if (is_callable($func)) {
-                call_user_func($func, $this);
-            }
-        }
-    }
-
-    /**
-     * @param mixed $callback  - A valid php callback, see php func is_callable()
-     *                         - A PEAR2_Exception::OBSERVER_* constant
-     *                         - An array(const PEAR2_Exception::OBSERVER_*,
-     *                           mixed $options)
-     * @param string $label    The name of the observer. Use this if you want
-     *                         to remove it later with removeObserver()
-     */
-    public static function addObserver($callback, $label = 'default')
-    {
-        self::$_observers[$label] = $callback;
-    }
-
-    public static function removeObserver($label = 'default')
-    {
-        unset(self::$_observers[$label]);
     }
 
     /**
@@ -142,7 +85,7 @@ abstract class Exception extends \Exception
      */
     public function getCauseMessage(array &$causes)
     {
-        $trace = $this->getTraceSafe();
+        $trace = $this->getTrace();
         $cause = array(
             'class'   => get_class($this),
             'message' => $this->message,
@@ -179,18 +122,5 @@ abstract class Exception extends \Exception
                 'line'    => $this->getPrevious()->getLine()
             );
         }
-    }
-
-    public function getTraceSafe()
-    {
-        if (!isset($this->_trace)) {
-            $this->_trace = $this->getTrace();
-            if (empty($this->_trace)) {
-                $backtrace = debug_backtrace();
-                $this->_trace = array($backtrace[count($backtrace)-1]);
-            }
-        }
-
-        return $this->_trace;
     }
 }

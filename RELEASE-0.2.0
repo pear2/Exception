@@ -17,12 +17,12 @@
         var_dump($cause);
     }
 
-    And combine that with getTraceSafe() or getTraceAsString() if needed.
+And combine that with getTraceSafe() or getTraceAsString() if needed.
 
-    Put all that in a function and use set_exception_handler('exceptionHandler'); or similar to process
-    all Exceptions.
+Put all that in a function and use set_exception_handler('exceptionHandler'); or similar to process
+all Exceptions.
 
-    Example code or see the removed code at http://svn.php.net/viewvc/pear2/Exception/trunk/src/Exception.php?r1=295348&r2=295352 :
+Example code or see the removed code at http://svn.php.net/viewvc/pear2/Exception/trunk/src/Exception.php?r1=295348&r2=295352 :
 
     function exceptionHandler($e)
     {

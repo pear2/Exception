@@ -1,0 +1,5 @@
+- Removed addObserver() / removeObserver() as people can achieve that
+  with their own observer function / classes via set_exception_handler
+- Removed getTraceSafe() as it was falling back on debug_backtrace()
+  when getTrace() was empty, which only happens when an Exception is
+  thrown outside of a class/function scope.
